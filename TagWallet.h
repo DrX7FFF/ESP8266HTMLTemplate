@@ -67,8 +67,7 @@ protected:
 	T _value;
 };
 
-typedef std::function<String(void)> HandlerFunction;  //Pour ESP
-//typedef string (*HandlerFunction)(); //Standar C
+typedef std::function<String(void)> HandlerFunction;  //Pour ESP //typedef string (*HandlerFunction)(); //Standar C
 class TagFctPtr : public TagAbstract<HandlerFunction> {
 public:
 	TagFctPtr(HandlerFunction value) : TagAbstract<HandlerFunction>(value){};
@@ -84,6 +83,17 @@ public:
 	virtual const char *dupValue() { return strdup(String(_value).c_str()); }
 	virtual void printValue() {
 		String temp = String(_value);
+		printf("%s (%u)[Int]", temp.c_str(), strlen(temp.c_str()));
+	}
+};
+
+class TagIntPtr : public TagAbstract<int*> {
+public:
+	TagIntPtr(int* value) : TagAbstract<int*>(value){};
+	virtual const char *getValueStr() { return String(*_value).c_str(); };
+	virtual const char *dupValue() { return strdup(String(*_value).c_str()); }
+	virtual void printValue() {
+		String temp = String(*_value);
 		printf("%s (%u)[Int]", temp.c_str(), strlen(temp.c_str()));
 	}
 };
@@ -143,6 +153,11 @@ public:
 		std::pair<itTagWallet, bool> res = _tags.emplace(name, nullptr);
 		if (res.second)
 			res.first->second = new TagString(value);
+	};
+	void setTag(const char *name, int* value) {
+		std::pair<itTagWallet, bool> res = _tags.emplace(name, nullptr);
+		if (res.second)
+			res.first->second = new TagIntPtr(value);
 	};
 	void dump() {
 		for (const auto &kv : _tags) {
