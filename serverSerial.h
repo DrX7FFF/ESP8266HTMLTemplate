@@ -6,13 +6,15 @@
 
 class ServerSerial : public HTMLTemplateServerDef {
 public:
-	virtual void sendContent(const char *content) { sendContent_P(content); }
+	virtual void sendContent(const char *content) {
+		Serial.printf(content); 
+	};
 	virtual void sendContent_P(PGM_P content) {
-		printf(content);
+		Serial.printf_P(content);
 	};
 	virtual void sendContent_P(PGM_P content, uint32_t len){
-		printf("%.*s", len, content);
-	}
+		Serial.printf_P("%.*s", len, content);
+	};
 };
 
 #endif  // __SERVERSERIAL_H__

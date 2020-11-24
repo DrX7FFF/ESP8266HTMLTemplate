@@ -36,8 +36,6 @@ public:
 				_tags.reverse();
 			}
 		};
-		for (HTMLTemplateTag &t : _tags)
-			printf("{%s,%u,%u}\r\n", t.name, t.pos, t.len);
 		regfree(&regexCompiled);
 	};
 	~HTMLTemplateDef() {
@@ -45,7 +43,10 @@ public:
 			free(t.name);
 		_tags.clear();
 	};
-
+	void dump(){
+		for (HTMLTemplateTag &t : _tags)
+			printf("{%s,%u,%u}\r\n", t.name, t.pos, t.len);
+	}
 	void send(HTMLTemplateServerDef *server);
 
 private:
