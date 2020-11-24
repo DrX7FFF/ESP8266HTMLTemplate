@@ -4,7 +4,6 @@
 #include <FS.h>
 #include <regex.h>
 #include <forward_list>
-//#include <HTMLTemplateServer.h>
 
 class HTMLTemplateServerDef;
 
@@ -16,7 +15,6 @@ struct HTMLTemplateTag {
 		: name(name), pos(pos), len(len){};
 };
 
-//template <typename Server = HTMLTemplateServerDef>
 class HTMLTemplateDef {
 public:
 	HTMLTemplateDef(const __FlashStringHelper *pattern, const char *tagRegex = "@{([a-zA-Z0-9]+)}") : _pattern((PGM_P)pattern) {
