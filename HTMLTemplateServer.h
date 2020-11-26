@@ -8,13 +8,12 @@
 class HTMLTemplateServerDef : public TagWallet {
 public:
 	void setTemplate(TemplateDef *templ) { _templ = templ; };
+	virtual void sendLength(int length);
 	virtual void sendPage() { _templ->send(this); };
-	virtual void sendContent_P(PGM_P content);
 	virtual void sendContent(const char *content);
+	virtual void sendContent(std::string content){	sendContent(content.c_str());};
+	virtual void sendContent_P(PGM_P content);
 	virtual void sendContent_P(PGM_P content, uint32_t len);
-	virtual void sendContent(std::string content){
-		sendContent(content.c_str());
-	};
 protected:
 	TemplateDef *_templ;
 };

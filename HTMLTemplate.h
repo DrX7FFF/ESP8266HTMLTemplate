@@ -46,10 +46,7 @@ public:
 	~TemplateDef() {
 		free(_tags);
 	};
-	void dump(){
-		for (uint16_t i = 0; i<_tagCount; i++)
-			printf("{%u,%u,%u,%u}\r\n", _tags[i].tagPos, _tags[i].tagLen, _tags[i].namePos, _tags[i].nameLen);
-	}
+
 	void send(HTMLTemplateServerDef *server);
 
 private:
