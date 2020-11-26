@@ -3,21 +3,20 @@
 
 #include <FS.h>
 #include <regex.h>
-#include <forward_list>
+#include <queue>
 
 class HTMLTemplateServerDef;
 
-struct HTMLTemplateTag {
-	char *name;
-	uint32_t pos;
-	size_t len;
-	HTMLTemplateTag(char *name, uint32_t pos, size_t len)
-		: name(name), pos(pos), len(len){};
+struct TemplateTag {
+	uint32_t tagPos;
+	uint16_t tagLen;
+	uint8_t namePos;
+	uint8_t nameLen;
 };
 
-class HTMLTemplateDef {
+class TemplateDef {
 public:
-	HTMLTemplateDef(const __FlashStringHelper *pattern, const char *tagRegex = "@{([a-zA-Z0-9]+)}") : _pattern((PGM_P)pattern) {
+	TemplateDef(const __FlashStringHelper *pattern, const char *tagRegex = "@{([a-zA-Z0-9]+)}") : _pattern((PGM_P)pattern) {
 		regex_t regexCompiled;
 		int ret = regcomp(&regexCompiled, tagRegex, REG_EXTENDED);
 		if (ret)
@@ -26,32 +25,37 @@ public:
 			if (regexCompiled.re_nsub != 1)
 				printf("One group and only one int regex string (group found=%u)\r\n", regexCompiled.re_nsub);
 			else {
+				std::queue<TemplateTag> fifoTag;
 				regmatch_t matchs[2];
 				String buffer(_pattern);
 				uint32_t offset = 0;
 				while (regexec(&regexCompiled, &buffer[offset], 2, matchs, 0) == 0) {
-					_tags.push_front({strndup(&buffer[offset + matchs[1].rm_so], matchs[1].rm_eo - matchs[1].rm_so), offset + matchs[0].rm_so, (size_t)(matchs[0].rm_eo - matchs[0].rm_so)});
+					fifoTag.push({offset + matchs[0].rm_so, (uint8_t)(matchs[0].rm_eo - matchs[0].rm_so), (uint8_t)(matchs[1].rm_so - matchs[0].rm_so), (uint8_t)(matchs[1].rm_eo - matchs[1].rm_so)});
 					offset += matchs[0].rm_eo;
 				}
-				_tags.reverse();
+				_tagCount = fifoTag.size();
+				_tags = new TemplateTag[_tagCount];
+				for(uint16_t i = 0; i< _tagCount; i++){
+					_tags[i] = fifoTag.front();
+					fifoTag.pop();
+				}
 			}
 		};
 		regfree(&regexCompiled);
 	};
-	~HTMLTemplateDef() {
-		for (HTMLTemplateTag &t : _tags)
-			free(t.name);
-		_tags.clear();
+	~TemplateDef() {
+		free(_tags);
 	};
 	void dump(){
-		for (HTMLTemplateTag &t : _tags)
-			printf("{%s,%u,%u}\r\n", t.name, t.pos, t.len);
+		for (uint16_t i = 0; i<_tagCount; i++)
+			printf("{%u,%u,%u,%u}\r\n", _tags[i].tagPos, _tags[i].tagLen, _tags[i].namePos, _tags[i].nameLen);
 	}
 	void send(HTMLTemplateServerDef *server);
 
 private:
 	PGM_P _pattern;
-	std::forward_list<HTMLTemplateTag> _tags;
+	TemplateTag * _tags;
+	uint16_t _tagCount;
 };
 
 #endif  // __HTMLTEMPLATE_H__

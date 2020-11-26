@@ -7,7 +7,7 @@
 
 class HTMLTemplateServerDef : public TagWallet {
 public:
-	void setTemplate(HTMLTemplateDef *templ) { _templ = templ; };
+	void setTemplate(TemplateDef *templ) { _templ = templ; };
 	virtual void sendPage() { _templ->send(this); };
 	virtual void sendContent_P(PGM_P content);
 	virtual void sendContent(const char *content);
@@ -16,7 +16,7 @@ public:
 		sendContent(content.c_str());
 	};
 protected:
-	HTMLTemplateDef *_templ;
+	TemplateDef *_templ;
 };
 
 #endif  // __HTMLTEMPLATESERVER_H__
