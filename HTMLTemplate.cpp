@@ -1,10 +1,11 @@
 #include <HTMLTemplate.h>
-#include <HTMLTemplateServer.h>
 #include <TagWallet.h>
+#include <ESP8266HTMLServer.h>
 
-void TemplateDef::send(HTMLTemplateServerDef *server) {
+void TemplateDef::sendWithServer(ESP8266HTMLServer *server) {
 	TagCache cache;
 	size_t length = strlen_P(_pattern);
+	
 	for (uint16_t i = 0; i<_tagCount; i++){
 		char tempName[_tags[i].nameLen+1];
 		strncpy_P(tempName, &_pattern[_tags[i].tagPos+_tags[i].namePos], _tags[i].nameLen);
@@ -16,6 +17,7 @@ void TemplateDef::send(HTMLTemplateServerDef *server) {
 		//  else
 		//  	printf("Tag '%s' at %u not found\r\n", t.name, t.pos);
 	}
+
 	server->sendLength(length);
 
 	uint32_t offset = 0;

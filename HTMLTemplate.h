@@ -2,10 +2,13 @@
 #define __HTMLTEMPLATE_H__
 
 #include <FS.h>
+#include <TagWallet.h>
 #include <regex.h>
+
+#include <forward_list>
 #include <queue>
 
-class HTMLTemplateServerDef;
+class ESP8266HTMLServer;
 
 struct TemplateTag {
 	uint32_t tagPos;
@@ -35,7 +38,7 @@ public:
 				}
 				_tagCount = fifoTag.size();
 				_tags = new TemplateTag[_tagCount];
-				for(uint16_t i = 0; i< _tagCount; i++){
+				for (uint16_t i = 0; i < _tagCount; i++) {
 					_tags[i] = fifoTag.front();
 					fifoTag.pop();
 				}
@@ -47,12 +50,21 @@ public:
 		free(_tags);
 	};
 
-	void send(HTMLTemplateServerDef *server);
+	void sendWithServer(ESP8266HTMLServer *server);
 
 private:
 	PGM_P _pattern;
-	TemplateTag * _tags;
+	TemplateTag *_tags;
 	uint16_t _tagCount;
 };
 
+//typedef std::forward_list<TemplateDef> Page;
+class Page : public std::forward_list<TemplateDef> {
+public:
+	Page(std::initializer_list<TemplateDef> il) : std::forward_list<TemplateDef>(il){};
+	void sendWithServer(ESP8266HTMLServer *server) {
+		for (auto it = begin(); it != end(); ++it)
+			it->sendWithServer(server);
+	};
+};
 #endif  // __HTMLTEMPLATE_H__

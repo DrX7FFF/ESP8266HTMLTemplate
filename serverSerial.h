@@ -2,9 +2,8 @@
 #define __SERVERSERIAL_H__
 
 #include <FS.h>
-#include <HTMLTemplateServer.h>
 
-class ServerSerial : public HTMLTemplateServerDef {
+class ServerSerial {
 public:
 	virtual void sendLength(int length){
 		Serial.printf("Total à envoyer = %u\r\n", length);
