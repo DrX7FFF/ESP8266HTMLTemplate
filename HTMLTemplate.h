@@ -2,13 +2,12 @@
 #define __HTMLTEMPLATE_H__
 
 #include <FS.h>
-#include <TagWallet.h>
 #include <regex.h>
 
-#include <forward_list>
 #include <queue>
 
 class ESP8266HTMLServer;
+class TagBase;
 
 struct TemplateTag {
 	uint32_t tagPos;
@@ -50,21 +49,24 @@ public:
 		free(_tags);
 	};
 
+	size_t getLenght(ESP8266HTMLServer *server);
 	void sendWithServer(ESP8266HTMLServer *server);
 
 private:
 	PGM_P _pattern;
 	TemplateTag *_tags;
 	uint16_t _tagCount;
+	TagBase **_tagTemp;
 };
 
-//typedef std::forward_list<TemplateDef> Page;
-class Page : public std::forward_list<TemplateDef> {
+class Page {
 public:
-	Page(std::initializer_list<TemplateDef> il) : std::forward_list<TemplateDef>(il){};
-	void sendWithServer(ESP8266HTMLServer *server) {
-		for (auto it = begin(); it != end(); ++it)
-			it->sendWithServer(server);
+	Page(const __FlashStringHelper *pattern, const char *tagRegex = "@{([a-zA-Z0-9]+)}") {
+		_templ = new TemplateDef(pattern);
 	};
+	void sendWithServer(ESP8266HTMLServer *server);
+
+protected:
+	TemplateDef *_templ;
 };
 #endif  // __HTMLTEMPLATE_H__

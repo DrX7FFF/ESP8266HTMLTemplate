@@ -12,7 +12,7 @@ public:
 		ESP8266WebServer::on(uri, std::bind(&Page::sendWithServer, page, this)); //Call this->sendPage(page)
 		// ESP8266WebServer::on(uri, std::bind(&ESP8266HTMLServer::sendPage, this, page)); //Call this->sendPage(page)
 	};
-	void sendLength(int length) {
+	void sendLength(size_t length) {
 		String header;
 		_prepareHeader(header, 200, "text/html", length);
 		_currentClient.write((const uint8_t *)header.c_str(), header.length());
