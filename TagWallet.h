@@ -45,6 +45,14 @@ protected:
 	const char *_cache = nullptr;
 };
 
+class TagStringPtr : public TagAbstract<const String*> {
+public:
+	TagStringPtr(const String *value) : TagAbstract<const String*>(value){};
+	virtual size_t getLenght(ESP8266HTMLServer *server) { return (*_value).length(); };
+	virtual void sendWithServer(ESP8266HTMLServer *server);
+};
+
+
 class TagCharPtr : public TagAbstract<const char *> {
 public:
 	TagCharPtr(const char *value) : TagAbstract<const char *>(value){};
@@ -83,37 +91,50 @@ public:
 		return it != _tags.end() ? it->second : nullptr;
 	};
 
+	// Pointeur sur une fonction
 	void setTag(const char *name, HandlerFunction value) {
 		std::pair<itTagWallet, bool> res = _tags.emplace(name, nullptr);
 		if (res.second)
 			res.first->second = new TagFctPtr(value);
 	};
+	// Entier constant
 	void setTag(const char *name, int value) {
 		std::pair<itTagWallet, bool> res = _tags.emplace(name, nullptr);
 		if (res.second)
 			res.first->second = new TagCharPtr(strdup(String(value).c_str()));
 	};
+	// Char * constant
 	void setTag(const char *name, const char *value) {
 		std::pair<itTagWallet, bool> res = _tags.emplace(name, nullptr);
 		if (res.second)
 			res.first->second = new TagCharPtr(value);
 	};
+	// Sting constant
 	void setTag(const char *name, const String value) {
 		std::pair<itTagWallet, bool> res = _tags.emplace(name, nullptr);
 		if (res.second)
 			res.first->second = new TagCharPtr(strdup(value.c_str()));
 	};
+	// Sting pointeur
+	void setTag(const char *name, const String* value) {
+		std::pair<itTagWallet, bool> res = _tags.emplace(name, nullptr);
+		if (res.second)
+			res.first->second = new TagStringPtr(value);
+	};
+	// Pointeur sur un entier
 	//TODO gestion cache
-	// void setTag(const char *name, int *value) {
-	// 	std::pair<itTagWallet, bool> res = _tags.emplace(name, nullptr);
-	// 	if (res.second)
-	// 		res.first->second = new TagIntPtr(value);
-	// };
+	void setTag(const char *name, int *value) {
+		std::pair<itTagWallet, bool> res = _tags.emplace(name, nullptr);
+		if (res.second)
+			res.first->second = new TagIntPtr(value);
+	};
+	// PROGMEM
 	void setTag(const char *name, const __FlashStringHelper *value) {
 		std::pair<itTagWallet, bool> res = _tags.emplace(name, nullptr);
 		if (res.second)
 			res.first->second = new TagPROGMEM((PGM_P)value);
 	};
+	// Template
 	void setTag(const char *name, TemplateDef *value) {
 		std::pair<itTagWallet, bool> res = _tags.emplace(name, nullptr);
 		if (res.second)

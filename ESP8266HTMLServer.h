@@ -5,13 +5,9 @@
 #include <HTMLTemplate.h>
 #include <TagWallet.h>
 
-class ESP8266HTMLServer : public ESP8266WebServer, public TagWallet  {
+class ESP8266HTMLServer : public ESP8266WebServer, public TagWallet {
 public:
 	ESP8266HTMLServer(int port = 80) : ESP8266WebServer(port){};
-	void on(const Uri &uri, Page* page){
-		ESP8266WebServer::on(uri, std::bind(&Page::sendWithServer, page, this)); //Call this->sendPage(page)
-		// ESP8266WebServer::on(uri, std::bind(&ESP8266HTMLServer::sendPage, this, page)); //Call this->sendPage(page)
-	};
 	void sendLength(size_t length) {
 		String header;
 		_prepareHeader(header, 200, "text/html", length);

@@ -14,9 +14,9 @@ size_t TemplateDef::getLenght(ESP8266HTMLServer *server) {
 		if (_tagTemp[i]) {
 			length -= _tags[i].tagLen;
 			length += _tagTemp[i]->getLenght(server);
+		} else {
+			DEBUGLOG("Tag @{%s} not found in wallet\r\n", tempName);
 		}
-		//  else
-		//  	printf("Tag '%s' at %u not found\r\n", t.name, t.pos);
 	}
 	return length;
 }
@@ -35,7 +35,7 @@ void TemplateDef::sendWithServer(ESP8266HTMLServer *server) {
 	delete _tagTemp;
 }
 
-void Page::sendWithServer(ESP8266HTMLServer *server) {
-	server->sendLength(_templ->getLenght(server));
-	_templ->sendWithServer(server);
+void Page::sendWithServer() {
+	_server->sendLength(_templ->getLenght(_server));
+	_templ->sendWithServer(_server);
 }
